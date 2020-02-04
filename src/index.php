@@ -11,7 +11,6 @@
     const URL = 'http://www.partyline.be/images/downloads/maandkalendernl.pdf';
     const REGEX = '/\d{2}\/\d{2}/';
     const FORMAT = '%d/%m';
-    const SLACK_KEY = 'xoxp-123563945011-124138890931-238043026310-ed09d348d1962b132d3dbda1da9dcc8e';
 
     $parser = new Parser();
     $data = getDataFromPDFFile($parser->parseFile(URL));
