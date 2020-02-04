@@ -7,4 +7,13 @@ This is the soup bot which is used to update the slack topic in the MEDIAGENIX w
 ```bash
 composer update
 ```
+4. Create a new php file called **secrets.php** in the src folder containing the next code
+```php
+<?php
+    const TRANSLATION_KEY = 'xxx';
+    const SLACK_KEY = 'xxx';
+```
+5. Generate a yandex API key (https://translate.yandex.com/developers/keys) and put it in the **secrets.php** file
+6. For the slack API key, you can ask me :)
+
 4. Put the folder in the **xampp/htdocs** folder and browse to **http://localhost/src/**
