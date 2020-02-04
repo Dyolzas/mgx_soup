@@ -9,8 +9,13 @@
     setlocale(LC_ALL, 'nl_NL.utf8', 'nld_NLD');
 
     const URL = 'http://www.partyline.be/images/downloads/maandkalendernl.pdf';
-    const REGEX = '/\d{2}\/\d{2}/';
-    const FORMAT = '%d/%m';
+    // 30/01
+    //const REGEX = '/\d{2}\/\d{2}/';
+    //const FORMAT = '%d/%m';
+
+    // ma 3 feb
+    const REGEX = '/(?:ma|di|wo|do|vr) \d{1,2} [a-z]{3}/';
+    const FORMAT = '%a%e %b';
 
     $parser = new Parser();
     $data = getDataFromPDFFile($parser->parseFile(URL));
