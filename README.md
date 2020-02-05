@@ -13,7 +13,7 @@ composer update
     const TRANSLATION_KEY = 'xxx';
     const SLACK_KEY = 'xxx';
 ```
-5. Generate a yandex API key (https://translate.yandex.com/developers/keys) and put it in the **secrets.php** file
-6. For the slack API key, you can ask me :)
+5. Generate a Yandex API key (https://translate.yandex.com/developers/keys) and put it in the **secrets.php** file
+6. Generate a Slcak API key (https://api.slack.com/legacy/custom-integrations/legacy-tokens) and put it in the **secrets.php** file
 
 4. Put the folder in the **xampp/htdocs** folder and browse to **http://localhost/src/**
