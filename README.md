@@ -1,6 +1,6 @@
 # Soup Bot
 This is the soup bot which is used to update the slack topic in the MEDIAGENIX workspace
-## Intallation
+## Installation
 1. Install php so you can run it on your computer. I'm using Xampp (https://www.apachefriends.org/index.html)
 2. Install composer (https://getcomposer.org/)
 3. Install the pdf parser with the command: 
@@ -13,7 +13,7 @@ composer update
     const TRANSLATION_KEY = 'xxx';
     const SLACK_KEY = 'xxx';
 ```
-5. Generate a yandex API key (https://translate.yandex.com/developers/keys) and put it in the **secrets.php** file
-6. For the slack API key, you can ask me :)
+5. Generate a Yandex API key (https://translate.yandex.com/developers/keys) and put it in the **secrets.php** file
+6. Generate a Slack API key (https://api.slack.com/legacy/custom-integrations/legacy-tokens) and put it in the **secrets.php** file
 
 4. Put the folder in the **xampp/htdocs** folder and browse to **http://localhost/src/**
