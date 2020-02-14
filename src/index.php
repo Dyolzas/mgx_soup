@@ -15,7 +15,7 @@
 
     // ma 3 feb
     const REGEX = '/(?:ma|di|wo|do|vr) \d{1,2} [a-z]{3}/';
-    const FORMAT = '%a%e %b';
+    const FORMAT = '%a %e %b';
 
     $parser = new Parser();
     $data = getDataFromPDFFile($parser->parseFile(URL));
@@ -100,6 +100,7 @@
         $today =  strtotime('today');
         for($i = 0; $i<5; $i++){
             $dateString = strftime(FORMAT, $date);
+            $dateString = preg_replace('!\s+!', ' ', $dateString);
             $soup = findSoupBasedOnDate($arrayOfSoups, $dateString);
             if($date == $today)
                 $topic .= '*';
