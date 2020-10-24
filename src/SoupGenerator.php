@@ -35,8 +35,8 @@
             $today = strtotime('today');
             $monday = strtotime('monday this week');
             $friday = strtotime('friday this week');
-           // if(date('N', $today) >= 6)
-              //  return null; //weekend
+            if(date('N', $today) >= 6)
+                return null; //weekend
             $url = BASE_URL.'menu'.strftime('%d',$monday).'t'.strftime('%d',$friday).strftime('%b',$monday).'nl.pdf';
             if(!SoupGenerator::urlExists($url))
                 return null;
