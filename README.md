@@ -12,6 +12,6 @@ composer update
 <?php
     const SLACK_KEY = 'xxx';
 ```
-6. Generate a Slack API key (https://api.slack.com/legacy/custom-integrations/legacy-tokens) and put it in the **secrets.php** file
+5. Generate a Slack API key (https://api.slack.com/legacy/custom-integrations/legacy-tokens) and put it in the **secrets.php** file
 
-4. Put the folder in the **xampp/htdocs** folder and browse to **http://localhost/src/**
+6. Put the folder in the **xampp/htdocs** folder and browse to **http://localhost/src/**
