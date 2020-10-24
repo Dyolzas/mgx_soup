@@ -6,22 +6,54 @@
 
     use Smalot\PdfParser\Parser;
 
-    setlocale(LC_ALL, 'nl_NL.utf8', 'nld_NLD');
+    setlocale(LC_ALL, array('nl_NL.utf8','nl_NL@euro','nl_NL', 'nld_NLD', 'dutch'));
 
-    const URL = 'http://www.partyline.be/images/downloads/maandkalendernl.pdf';
+    const BASE_URL = 'https://www.partyline.be/images/downloads/';
     // 30/01
     //const REGEX = '/\d{2}\/\d{2}/';
     //const FORMAT = '%d/%m';
 
     // ma 3 feb
+    const ONE_DAY = 86400;
     const REGEX = '/(?:ma|di|wo|do|vr) \d{1,2} [a-z]{3}/';
     const FORMAT = '%a %e %b';
 
-    $parser = new Parser();
-    $data = getDataFromPDFFile($parser->parseFile(URL));
-    $arrayOfSoups = parseSoups($data);
-    $topic = generateTopic($arrayOfSoups);
-    sendTopicToSlack($topic);
+    $url = generateURL();
+    if(!is_null($url)){
+        $data = getDataFromPDFFile((new Parser())->parseFile($url));
+        $arrayOfSoups = parseSoups($data);
+        $topic = generateTopic($arrayOfSoups);
+        sendTopicToSlack($topic);
+    }
+
+    /////////////////////////////////////
+    ///
+    ///      Generating URL
+    ///
+    ////////////////////////////////////
+
+    function generateURL(){
+        $today = strtotime('today');
+        $monday = strtotime('monday this week');
+        $friday = strtotime('friday this week');
+        if(date('N', $today) >= 6)
+            return null; //weekend
+        $url = BASE_URL.'menu'.strftime('%d',$monday).'t'.strftime('%d',$friday).strftime('%b',$monday).'nl.pdf';
+        if(!urlExists($url))
+            return null;
+        return $url;
+    }
+
+    function urlExists($url){
+        $file_headers = @get_headers($url);
+        if(!$file_headers || containsSubstring($file_headers[0], '404'))
+            return false;
+        return true;
+    }
+
+    function containsSubstring($string, $needle){
+        return (strpos($string, $needle) !== false);
+    }
 
     /////////////////////////////////////
     ///
@@ -37,39 +69,27 @@
 
     function parseSoups($data){
         $array = array();
-        for($i=0; $i<sizeof($data); $i++){
-            preg_match(REGEX,$data[$i],$matches);
-            if(sizeof($matches) != 1)
-                continue;
-            $soup = findSoupWithIndex($data, $i);
-            if(is_null($soup))
-                continue;
-            $soup->setDate($matches[0]);
+        $key  = array_search ( 'Soep (* vleesbouillons)' , $data);
+
+        if($key === false)
+            return [];
+
+        $sunday = strtotime('previous sunday');
+
+        for($i=1; $i<6; $i++){
+            $isVeggie = true;
+            $type = $data[$i+$key];
+            if(substr($type, -1) == '*'){
+                $type = substr($type, 0, -1);
+                $isVeggie = false;
+            }
+            $soup = new Soup();
+            $soup->setType($type);
+            $soup->setDate($sunday + $i * ONE_DAY);
+            $soup->setIsVeggie($isVeggie);
             array_push($array, $soup);
         }
         return $array;
-    }
-
-    function findSoupWithIndex($data, $i){
-        $soup = new Soup();
-        for($j=$i; $j<sizeof($data); $j++){
-            if(containsNumber($data[$j]))
-                continue;
-            if(substr($data[$j], -1) == '*') {
-                $soup->setIsVeggie(false);
-                $soup->setType(substr($data[$j], 0, -1));
-                return $soup;
-            }
-            $soup->setType($data[$j]);
-            if($data[$j+1] == '*')
-                $soup->setIsVeggie(false);
-            return $soup;
-        }
-        return null;
-    }
-
-    function containsNumber($string){
-        return (1 === preg_match('~[0-9]~', $string));
     }
 
     /////////////////////////////////////
@@ -95,37 +115,7 @@
     /// /////////////////////////////////
 
     function generateTopic($arrayOfSoups){
-        $topic = '';
-        $date = strtotime('monday this week');
-        $today =  strtotime('today');
-        for($i = 0; $i<5; $i++){
-            $dateString = strftime(FORMAT, $date);
-            $dateString = preg_replace('!\s+!', ' ', $dateString);
-            $soup = findSoupBasedOnDate($arrayOfSoups, $dateString);
-            if($date == $today)
-                $topic .= '*';
-            $topic .= date('D', $date).': ';
-            if(is_null($soup)){
-                $topic .= 'Royco';
-            } else{
-                $topic .= translateSoup($soup->getType());
-                if(!$soup->getIsVeggie())
-                    $topic .= ' :cut_of_meat:';
-            }
-            if($date == $today)
-                $topic .= '*';
-            $topic .= ' ';
-            $date += 86400;
-        }
-        return $topic;
-    }
-
-    function findSoupBasedOnDate($arrayOfSoups, $date){
-        foreach($arrayOfSoups as $soup){
-            if($soup->getDate() == $date)
-                return $soup;
-        }
-        return null;
+        return implode(' ', $arrayOfSoups);
     }
 
     /////////////////////////////////////
@@ -136,7 +126,7 @@
 
     function sendTopicToSlack($topic) {
 
-        $url = "https://mediagenix.slack.com/api/channels.info";
+        $url = "https://mediagenix.slack.com/api/conversations.info";
         $data = http_build_query(array("token" => SLACK_KEY, "channel" => "C3TS59BHT"));
 
         $result = sendAction($url, $data);
@@ -144,8 +134,8 @@
         $old_topic = json_decode($result)->channel->topic->value;
 
         if ($old_topic != $topic) {
-            $url = "https://mediagenix.slack.com/api/channels.setTopic";
-            $data = http_build_query(array("token" => SLACK_KEY, "topic" => $topic, "channel" => "C3TS59BHT", "username" => "soup_channel"));
+            $url = "https://mediagenix.slack.com/api/conversations.setTopic";
+            $data = http_build_query(array("token" => SLACK_KEY, "topic" => $topic, "channel" => "C3TS59BHT"));
             sendAction($url, $data);
         }
     }

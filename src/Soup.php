@@ -3,7 +3,7 @@
 
     class Soup {
 
-        private $date;
+        private $date; //In timestamp
         private $isVeggie = true;
         private $type;
 
@@ -29,6 +29,15 @@
 
         public function setType($type) {
             $this->type = $type;
+        }
+
+        public function __toString() {
+            $string = date('D', $this->getDate()).': '.$this->getType();
+            if(!$this->getIsVeggie())
+                $string .= ' :cut_of_meat:';
+            if(strtotime('today') == $this->getDate())
+                $string = '*'.$string.'*';
+            return $string;
         }
 
 
