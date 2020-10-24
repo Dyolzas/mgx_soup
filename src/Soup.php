@@ -1,6 +1,5 @@
 <?php
 
-
     class Soup {
 
         private $date; //In timestamp
@@ -32,13 +31,22 @@
         }
 
         public function __toString() {
-            $string = date('D', $this->getDate()).': '.$this->getType();
+           return $this->printSoup();
+        }
+
+        public function printSoup($shouldPrintDay = true){
+            $string = '';
+            if($shouldPrintDay)
+                $string .= date('D', $this->getDate()).': ';
+            $string .= $this->getType();
             if(!$this->getIsVeggie())
                 $string .= ' :cut_of_meat:';
-            if(strtotime('today') == $this->getDate())
-                $string = '*'.$string.'*';
+            if($shouldPrintDay && $this->isSoupOfTheDay())
+                $string = '`'.$string.'`';
             return $string;
         }
 
-
+        public function isSoupOfTheDay(){
+            return strtotime('today') == $this->getDate();
+        }
     }
