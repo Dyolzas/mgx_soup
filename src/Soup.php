@@ -39,10 +39,10 @@
             if($shouldPrintDay)
                 $string .= date('D', $this->getDate()).': ';
             $string .= $this->getType();
+            if($this->isSoupOfTheDay())
+                $string = '*'.$string.'*';
             if(!$this->getIsVeggie())
                 $string .= ' :cut_of_meat:';
-            if($shouldPrintDay && $this->isSoupOfTheDay())
-                $string = '`'.$string.'`';
             return $string;
         }
 
