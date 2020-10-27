@@ -10,9 +10,8 @@
     date_default_timezone_set('UTC');
 
     $arrayOfSoups = SoupGenerator::getSoups();
-    echo implode(' ', $arrayOfSoups);
-    //if(!empty($arrayOfSoups))
-        //TopicUpdater::updateTopic(implode(' ', $arrayOfSoups));
+    if(!empty($arrayOfSoups))
+        TopicUpdater::updateTopic(implode(' ', $arrayOfSoups));
 
 
 
